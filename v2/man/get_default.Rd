@@ -4,7 +4,12 @@
 \alias{get_default}
 \title{`get_default()`}
 \usage{
-get_default(.scenario = "granddata.d36109", .pollutant = 98, .by = "8.41")
+get_default(
+  .scenario = "granddata.d36109",
+  .pollutant = 98,
+  .by = "8.41",
+  base_url = default_base_url()
+)
 }
 \arguments{
 \item{.scenario}{eg. granddata.d36109}
@@ -12,6 +17,10 @@ get_default(.scenario = "granddata.d36109", .pollutant = 98, .by = "8.41")
 \item{.pollutant}{eg. 98}
 
 \item{.by}{eg. 8.41 --> look at moveslite::choices_aggregation for values. Some are single values (by = 16), while others are combinations like 8.41 (by = 8 for sourcetype 41)}
+
+\item{base_url}{Base URL of the CAT Public API, passed through to [query()].
+Defaults to the `moveslite.base_url` option, then the `MOVESLITE_BASE_URL`
+environment variable, then `"https://api.cat-apps.com/"`.}
 }
 \description{
 Produces `default()` input data for a given CATSERVER query.

@@ -12,8 +12,16 @@ query(
   sourcetype = NA,
   regclass = NA,
   fueltype = NA,
-  roadtype = NA
+  roadtype = NA,
+  base_url = default_base_url()
 )
+}
+\arguments{
+\item{base_url}{Base URL of the CAT Public API. Defaults to the
+`moveslite.base_url` option, then the `MOVESLITE_BASE_URL` environment
+variable, then `"https://api.cat-apps.com/"`. A trailing slash is optional,
+so both `"https://x"` and `"https://x/"` work. Use this to point the client
+at a replica, eg. `"https://connect.systems-apps.com/catplatform-public"`.}
 }
 \description{
 Function to query catserver using CAT Public API.

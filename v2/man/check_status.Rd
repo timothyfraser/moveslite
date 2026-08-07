@@ -4,7 +4,12 @@
 \alias{check_status}
 \title{check_status()}
 \usage{
-check_status()
+check_status(base_url = default_base_url())
+}
+\arguments{
+\item{base_url}{Base URL of the CAT Public API. Defaults to the
+`moveslite.base_url` option, then the `MOVESLITE_BASE_URL` environment
+variable, then `"https://api.cat-apps.com/"`. A trailing slash is optional.}
 }
 \description{
 Function to query the CAT Public API and check the status of CATSERVER.
