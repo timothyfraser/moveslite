@@ -9,7 +9,11 @@
 ### 1. Data Layer
 
 #### CAT Public API
-- **Base URL**: `https://api.cat-apps.com/`
+- **Base URL**: configurable since 0.2.0. Resolved in this order — the
+  `base_url` argument, the `moveslite.base_url` option, the `MOVESLITE_BASE_URL`
+  environment variable, then the historical default `https://api.cat-apps.com/`.
+  The API is currently served at `https://cat-apps.com/cat-public/` and at
+  `https://connect.systems-apps.com/cat-public/`.
 - **Endpoints**:
   - `/status/` - API health check
   - `/moveslite/v1/retrieve_data/` - Data retrieval
@@ -240,7 +244,10 @@ The architecture supports extension in several areas:
 ## Error Handling
 
 - **API Timeouts**: 10-second timeout on all API requests
-- **Failed Queries**: Returns HTTP response object instead of data frame
+- **Failed Queries**: Since 0.2.0, a non-200 response raises an error naming the
+  HTTP status code, the URL requested, and the first 200 characters of the
+  response body. (Before 0.2.0, `query()` returned the raw `httr` response
+  object, which downstream code could mistake for data.)
 - **Model Fitting**: `diagnose()` uses `purrr::possibly()` for graceful failure
 - **Missing Data**: Linear interpolation handles missing years
 

@@ -9,13 +9,17 @@
 
 **Description:** Handy helper function that ensures the API is ready before running queries. Useful for warming up the API connection.
 
-**Parameters:** None
+**Parameters:**
+- `base_url` (character, optional): Base URL of the API. Defaults to the `moveslite.base_url` option, then the `MOVESLITE_BASE_URL` environment variable, then `"https://api.cat-apps.com/"`. A trailing slash is optional.
 
 **Returns:** A data frame with API status information
+
+**Errors:** Raises an error on any non-200 response, naming the status code and URL.
 
 **Example:**
 ```r
 check_status()
+check_status(base_url = "https://cat-apps.com/cat-public/")
 ```
 
 ---
@@ -42,8 +46,11 @@ check_status()
 - `regclass` (integer, optional): EPA regulatory class ID
 - `fueltype` (integer, optional): EPA fueltype ID
 - `roadtype` (integer, optional): EPA roadtype ID
+- `base_url` (character, optional): Base URL of the API. Defaults to the `moveslite.base_url` option, then the `MOVESLITE_BASE_URL` environment variable, then `"https://api.cat-apps.com/"`. Trailing slashes are optional, and base URLs with a path prefix (e.g. `"https://cat-apps.com/cat-public"`) are supported.
 
-**Returns:** A tibble with queried data or an HTTP response object if the query fails
+**Returns:** A tibble with the queried data.
+
+**Errors:** Since 0.2.0, a non-200 response raises an error reporting the HTTP status code, the URL requested, and the first 200 characters of the response body.
 
 **Example:**
 ```r
@@ -69,6 +76,7 @@ data <- query(geoid = "36109", pollutant = 98, aggregation = 8,
 - `.scenario` (character): Scenario identifier, e.g., `"granddata.d36109"`
 - `.pollutant` (integer): Pollutant code, e.g., `98`
 - `.by` (character): Aggregation specification, e.g., `"8.41"` (sourcetype 8, type 41)
+- `base_url` (character, optional): Base URL of the API, passed through to `query()`. Same defaults as `query()`.
 
 **Returns:** A data frame with default/baseline data
 
@@ -95,8 +103,10 @@ log(emissions) ~ poly(log(vmt),3) + poly(year,2) + vehicles + sourcehours + star
 
 **Example:**
 ```r
-# Estimate model with default best formula
-model <- estimate(data = data, .vars = c("vmt", "vehicles", "year"))
+# Estimate model with default best formula. Note that `.vars` is ignored when
+# `.best = TRUE`, and the best formula needs vmt, year, vehicles, sourcehours,
+# and starts — so query all five.
+model <- estimate(data = data)
 
 # Estimate model with custom variables
 model <- estimate(data = data, .vars = c("vmt", "year"), .best = FALSE)
@@ -162,6 +172,8 @@ predictions %>% filter(type %in% c("custom", "benchmark"))
 - All predictor variables, with interpolated values for missing variables
 
 **Note:** Uses linear interpolation (`approxfun`) to estimate missing variable values for custom years.
+
+**Note:** `setx()` is internal — it is not exported in `NAMESPACE`. `project()` calls it for you; the example below is illustrative of what `project()` does internally.
 
 **Example:**
 ```r
@@ -273,6 +285,8 @@ trans_info <- find_transformation(model)
 - `upper`: Upper confidence bound
 
 **Note:** Uses simulation (1000 draws) with t-distribution to account for uncertainty in back-transformation.
+
+**Note:** `convert()` is internal — it is not exported in `NAMESPACE`. `project()` calls it whenever `find_transformation()` reports a transformed outcome.
 
 ---
 

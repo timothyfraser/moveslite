@@ -10,7 +10,9 @@ The goal of `moveslite` is to provide fast, highly accurate predictions of emiss
 
 ## Key Features
 
-- **Fast API-based queries** to the Cornell CATSERVER database
+- **Fast API-based queries** to the CAT Platform's public API
+- **Configurable API host** via the `base_url` argument, the `moveslite.base_url`
+  option, or the `MOVESLITE_BASE_URL` environment variable
 - **Statistical modeling** using linear regression with polynomial transformations
 - **Flexible aggregation levels** (overall, by sourcetype, fueltype, regulatory class, or roadtype)
 - **Scenario projection** with confidence intervals
@@ -31,15 +33,19 @@ This documentation is organized into the following sections:
 # Install and load the package
 library(moveslite)
 
+# Optional: point the client at a specific host
+options(moveslite.base_url = "https://cat-apps.com/cat-public/")
+
 # Check API status
 check_status()
 
-# Query data for a county (Tompkins County, NY)
-data <- query(geoid = "36109", pollutant = 98, aggregation = 16, 
-              var = c("year", "vmt", "vehicles"))
+# Query data for a county (Tompkins County, NY). The default model uses all
+# five activity measures, so ask for all five.
+data <- query(geoid = "36109", pollutant = 98, aggregation = 16,
+              var = c("year", "vmt", "vehicles", "starts", "sourcehours"))
 
 # Estimate a model
-model <- estimate(data = data, .vars = c("vmt", "vehicles", "year"))
+model <- estimate(data = data)
 
 # Generate predictions for a custom scenario
 predictions <- project(m = model, data = data, 
@@ -48,13 +54,16 @@ predictions <- project(m = model, data = data,
 
 ## Package Version
 
-This documentation covers **moveslite v2.0.1**.
+This documentation covers **moveslite 0.2.0** — see [`../NEWS.md`](../NEWS.md)
+for what changed.
 
 ## Additional Resources
 
 - MOVES Cheatsheet: [EPA MOVES Model Documentation](https://github.com/USEPA/EPA_MOVES_Model/blob/master/docs/MOVES4CheatsheetOnroad.pdf)
 - FIPS County Codes: [Census Bureau FIPS Codes](https://www2.census.gov/programs-surveys/decennial/2010/partners/pdf/FIPS_StateCounty_Code.pdf)
-- CAT Public API: `https://api.cat-apps.com/`
+- CAT Platform: <https://cat-apps.com>
+- `moveslite` guide on the platform: <https://connect.systems-apps.com/cat/#/docs/moveslite>
+- Public API reference: <https://connect.systems-apps.com/cat/#/docs/api-reference>
 
 
 
