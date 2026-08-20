@@ -4,6 +4,13 @@
 
 This document provides practical examples and use cases for the `moveslite` v2 package. Each use case demonstrates a common scenario for emissions analysis and policy evaluation.
 
+> **Before you start:** `estimate()` defaults to `.best = TRUE`, which fits the
+> paper's best formula — `log(emissions) ~ poly(log(vmt), 3) + poly(year, 2) +
+> vehicles + sourcehours + starts`. That formula needs **all five** activity
+> measures, so query `var = c("year", "vmt", "vehicles", "starts", "sourcehours")`.
+> If you only have some of them, pass `.best = FALSE` and list what you have in
+> `.vars`. Note that `.vars` is ignored when `.best = TRUE`.
+
 ## Table of Contents
 
 1. [Basic Emissions Query](#1-basic-emissions-query)
@@ -140,8 +147,8 @@ ggplot(comparison, aes(x = year, y = emissions, color = type)) +
 ```r
 # Query and estimate
 default <- query(geoid = "36109", pollutant = 98, aggregation = 16,
-                var = c("year", "vmt", "vehicles"))
-model <- estimate(data = default, .vars = c("vmt", "year"))
+                var = c("year", "vmt", "vehicles", "starts", "sourcehours"))
+model <- estimate(data = default)
 
 # Create multi-year scenario
 scenario <- tibble(
@@ -185,11 +192,10 @@ transit_data <- query(geoid = "36109",
                      pollutant = 98,
                      aggregation = 8,        # By sourcetype
                      sourcetype = 42,         # Public transit
-                     var = c("year", "vmt", "vehicles", "emissions"))
+                     var = c("year", "vmt", "vehicles", "starts", "sourcehours"))
 
 # Estimate model
-transit_model <- estimate(data = transit_data,
-                          .vars = c("vmt", "vehicles", "year"))
+transit_model <- estimate(data = transit_data)
 
 # Scenario: Increase transit VMT by 20%
 baseline_vmt <- transit_data %>% 
@@ -263,8 +269,8 @@ ggplot(comparison, aes(x = reorder(model, adj.r.squared), y = adj.r.squared)) +
 ```r
 # Setup
 default <- query(geoid = "36109", pollutant = 98, aggregation = 16,
-                var = c("year", "vmt", "vehicles"))
-model <- estimate(data = default, .vars = c("vmt", "year"))
+                var = c("year", "vmt", "vehicles", "starts", "sourcehours"))
+model <- estimate(data = default)
 
 # Define scenarios
 scenarios <- list(
@@ -309,8 +315,8 @@ counties <- c("36109", "36027", "36067")  # Tompkins, Dutchess, Monroe
 
 results <- map_dfr(counties, function(geoid) {
   data <- query(geoid = geoid, pollutant = 98, aggregation = 16,
-               var = c("year", "vmt", "emissions"))
-  model <- estimate(data, .vars = c("vmt", "year"))
+               var = c("year", "vmt", "vehicles", "starts", "sourcehours"))
+  model <- estimate(data)
   scenario <- tibble(year = 2023, vmt = 300000)
   predictions <- project(m = model, data = data, .newx = scenario)
   predictions %>%
